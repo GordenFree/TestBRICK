@@ -1,0 +1,19 @@
+version: '3'
+services:
+  app:
+    build: app/
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+    environment:
+      UUID: ${UUID}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/hostname"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    ports: 
+      - "8000-8002:8000"
+
+

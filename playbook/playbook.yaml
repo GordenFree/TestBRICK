@@ -1,0 +1,37 @@
+---
+- name: Создание нового пользователя и настройка SSH
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Создать пользователя brickdev c паролем pass
+      user:
+        name: brickdev
+        password: pass
+        state: present
+
+    - name: Разрешить авторизацию через SSH по ключу
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PermitRootLogin'
+        line: PermitRootLogin no
+        backrefs: yes
+        state: present
+
+    - name: Запретить логин по SSH от пользователя root
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^(.*)AllowRootLogin(.*)$'
+        line: '\1No\2'
+        backrefs: yes
+
+    - name: Скопировать публичный ключ для пользователя brickdev
+      authorized_key:
+        user: brickdev
+        key: "{{ lookup('file', 'key_file.pub') }}"
+        state: present
+
+    - name: Перезапустить SSH
+      service:
+        name: ssh
+        state: restarted
