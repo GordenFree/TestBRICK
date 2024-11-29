@@ -1,0 +1,2 @@
+Команда для запуска Ansible playbook:
+ansible-playbook playbook.yaml
